@@ -9,48 +9,124 @@ downloads: 2847
 rating: 4.8
 votes: 88
 featured: true
-install_command: "go install github.com/NMC-Interactive/agent-orchestrator/cmd/ao-dashboard@latest"
+install_command: "git clone https://github.com/NMC-Interactive/agent-orchestrator.git && ln -s $(pwd)/agent-orchestrator/skills/agent-orchestrator ~/.openclaw/skills/agent-orchestrator"
 screenshot: "/agents/ao-dashboard.png"
 logo: "/agents/ao-dashboard-logo.svg"
 published: 2024-02-10
 updated: 2024-02-10
 ---
 
-## The Problem with Picking One
+## Quick Start for Developers
 
-Every AI coding tool has strengths. Claude Code thinks deeply about architecture. Codex CLI moves fast on implementation. Kimi CLI 2.5 handles context windows that would choke most models. OpenCode lets you hack on the agent itself.
-
-But here's the friction: most workflows force you to pick **one** and shoehorn everything through it.
-
-I spent months bouncing between them. Cursor and other web tools are good, but I end up using Claude code cli for the big-picture and majority of development stuff,  but claude code debug works are nightmare to me, that I spent a lot of time back and forth, until codex of OpenAI being introduced.  Then switching to Codex when I needed a more precise model and speed to answers.  At the same time, I keep using Claude for planning and quality review, when the refactoring got complex. Each switch meant has a cost of losing context. Each switch meant paying for the premium tier of yet another IDE just to get the model I wanted.
-
-The "one IDE to rule them all" approach sounds nice in theory. In practice, it means compromises.
-
-## Use the Right Model for the Task
-
-Agent Orchestrator started as a personal tool a week ago when I started using Clawdbot.  It made my life much easier with its unique context management.  I feel so much relief when I start developing the agent-orchetrator skill, which spawn and run multiple agents at the same time.  The idea is simple: run agents in parallel from a single terminal dashboard. Each agent gets its own isolated context. No cross-contamination. No "one model trying to do everything."  I enjoy a lot.  Hope you feel the same way I do.
+If you just want the dashboard binary:
 
 ```bash
-# Start the dashboard
-ao-dashboard --daemon
+# Download and install (macOS/Linux)
+curl -L https://github.com/NMC-Interactive/agent-orchestrator/releases/latest/download/ao-dashboard-$(uname -s | tr '[:upper:]' '[:lower:]')-$(uname -m) -o ao-dashboard
+chmod +x ao-dashboard
+sudo mv ao-dashboard /usr/local/bin/
 
-# Spawn specialized agents
-ao spawn architect claude     # Design the API
-ao spawn builder codex        # Implement endpoints  
-ao spawn reviewer claude      # Review the PR
+# Or use Go
+go install github.com/NMC-Interactive/agent-orchestrator/cmd/ao-dashboard@latest
 ```
 
-The dashboard shows what's running, what's waiting, and what failed. You decide when to refresh. You decide when to retry. The agents do the work; you stay in control.
+---
 
-## Built for Terminal Workflows
+## For OpenClaw Users (Recommended)
 
-I'm an introvert who lives in the terminal. The last thing I want is another electron app buzzing with notifications.
+**Let OpenClaw set this up for you.** Run this in your OpenClaw chat:
+
+```
+Clone https://github.com/NMC-Interactive/agent-orchestrator and link the skill for me
+```
+
+OpenClaw will:
+1. Clone the repository to your workspace
+2. Link the skill to `~/.openclaw/skills/agent-orchestrator`
+3. Confirm the dashboard is ready to use
+
+Once linked, you can control everything via chat:
+
+```
+/ao start                    # Launch dashboard
+/ao spawn builder codex      # Start implementation
+/ao spawn reviewer claude    # Parallel review
+/ao status                   # Check what's running
+```
+
+---
+
+## What is Agent Orchestrator?
+
+It's two things that work together:
+
+1. **Dashboard** — A terminal UI showing all your agents at once
+2. **Skill** — Chat commands (`/ao`) that control the dashboard through OpenClaw
+
+You can use the dashboard alone. But with OpenClaw, you get chat-based control—spawn agents, check status, retry failures, all without leaving your conversation.
+
+---
+
+## Using the Skill
+
+Once installed (via OpenClaw or manual), these commands work in any OpenClaw session:
+
+| Command | What It Does |
+|---------|--------------|
+| `/ao start` | Launch the dashboard in daemon mode |
+| `/ao spawn <name> <agent>` | Start a new agent session |
+| `/ao status` | Show running/completed/failed counts |
+| `/ao kill <session>` | Stop a running session |
+| `/ao retry <session>` | Retry a failed session |
+| `/ao clear-failed` | Clean up failed sessions |
+
+### Example Workflow
+
+```
+You: /ao start
+Clawdbot: Dashboard running. 0 active sessions.
+
+You: /ao spawn architect claude
+Clawdbot: Spawned architect (claude). Status: running.
+
+You: Design the API for a user service
+[Claude works in background]
+
+You: /ao spawn builder codex
+Clawdbot: Spawned builder (codex). Status: running.
+
+You: /ao status
+Clawdbot: Running: 2 | architect (claude) - 8 turns | builder (codex) - 3 turns
+
+You: /ao spawn reviewer claude
+Clawdbot: Spawned reviewer (claude). Waiting for builder...
+```
+
+The reviewer waits automatically. When builder finishes, reviewer starts with fresh context.
+
+---
+
+## When to Use Which Agent
+
+| Task | Agent | Why |
+|------|-------|-----|
+| Architecture & design | Claude | Thinks through trade-offs, asks good questions |
+| Implementation & refactoring | Codex | Fast, follows patterns, doesn't overthink |
+| Legacy code analysis | Kimi | 1M token context swallows entire repos |
+| Security review | Claude (fresh) | Second instance, no shared bias |
+| Experiments | OpenCode | Hackable, inspectable, yours |
+
+---
+
+## The Dashboard (Terminal UI)
+
+The skill controls a terminal dashboard that looks like this:
 
 ```bash
 ┌─ Agent Orchestrator ─────────────────────────┐
 │ Running: 3 | Completed: 12 | Failed: 0       │
 ├──────────────────────────────────────────────┤
-│ architect   │ claude  │ running │ 4 turns    │
+│ architect   │ claude  │ running │ 8 turns    │
 │ builder     │ codex   │ running │ 12 turns   │
 │ reviewer    │ claude  │ waiting │ 0 turns    │
 └──────────────────────────────────────────────┘
@@ -58,54 +134,19 @@ I'm an introvert who lives in the terminal. The last thing I want is another ele
 Keys: (r)efresh  (:)command  (T)retry  (C)clear  (q)uit
 ```
 
-Some deliberate choices:
+**Key features:**
+- **Static UI** — Press `r` to refresh. No distracting auto-updates.
+- **Activity log** — See what changed without noise.
+- **Auto-compact** — Rotates context at 10 turns to prevent drift.
+- **Cross-platform** — macOS, Linux, Windows, WSL.
 
-- **Static UI** — No distracting auto-refresh. Press `r` when you want updates, not when the app decides to show them.
-- **Activity log** — See what changed without verbose noise. Just the facts.
-- **Compact mode** — Auto-rotate context at 10 turns. Prevents the gradual drift that happens when an agent talks too long.
+---
 
-## When to Use Which
+## Installing the Dashboard (Manual)
 
-This isn't about replacing your favorite tool. It's about not being stuck with it when another tool would be better.
+If you didn't use OpenClaw to set this up:
 
-| Situation | What Works |
-|-----------|------------|
-| Greenfield architecture | Claude — thinks through trade-offs, asks clarifying questions |
-| Fast implementation | Codex — follows patterns, doesn't overthink |
-| Legacy codebase archaeology | Kimi — 1M token context swallows entire repos |
-| Security-critical review | Second Claude instance — fresh eyes, no shared context |
-| Experimental workflows | OpenCode — hackable, inspectable, yours |
-
-The dashboard doesn't judge your choices. It just makes them possible without friction.
-
-## Native OpenClaw Integration
-
-If you use OpenClaw (and if you're reading this, you probably do), you can control the dashboard via chat:
-
-```
-/ao start                    # Launch dashboard
-/ao spawn builder codex      # Start implementation
-/ao spawn reviewer claude    # Parallel review
-```
-
-**To enable this:**
-```bash
-# 1. Install the dashboard (see above)
-# 2. Install the skill
-git clone https://github.com/NMC-Interactive/agent-orchestrator.git
-ln -s $(pwd)/agent-orchestrator/skills/agent-orchestrator ~/.openclaw/skills/agent-orchestrator
-```
-
-The dashboard runs in your terminal. The skill lets you control it from OpenClaw chat. Both work independently—you can use the dashboard without the skill, or the skill without other OpenClaw features.
-
-## Installation
-
-### Option 1: Go Install (Recommended)
-```bash
-go install github.com/NMC-Interactive/agent-orchestrator/cmd/ao-dashboard@latest
-```
-
-### Option 2: Download Binary
+### Option 1: Download Binary
 ```bash
 # macOS
 curl -L https://github.com/NMC-Interactive/agent-orchestrator/releases/latest/download/ao-dashboard-darwin-amd64 -o ao-dashboard
@@ -121,6 +162,11 @@ sudo mv ao-dashboard /usr/local/bin/
 # Download from: https://github.com/NMC-Interactive/agent-orchestrator/releases/latest
 ```
 
+### Option 2: Go Install
+```bash
+go install github.com/NMC-Interactive/agent-orchestrator/cmd/ao-dashboard@latest
+```
+
 ### Option 3: Build from Source
 ```bash
 git clone https://github.com/NMC-Interactive/agent-orchestrator.git
@@ -129,38 +175,72 @@ go build -o bin/ao-dashboard ./cmd/ao-dashboard
 sudo mv bin/ao-dashboard /usr/local/bin/
 ```
 
-Requirements: macOS, Linux, Windows, or WSL. No Docker. No cloud dependencies. Just a terminal.
+---
 
-## Quick Start
+## Using the Dashboard (Standalone)
+
+Without OpenClaw, you run the dashboard directly:
 
 ```bash
-# Interactive TUI mode
+# First-time setup
+ao-dashboard --init
+
+# Start daemon
 ao-dashboard --daemon
 
-# Keys while running:
-r     # Refresh status
-:     # Enter command mode (type 'kill architect' or 'retry builder')
-C     # Clear all sessions
-T     # Retry all failed
-?     # Help
-q     # Quit
+# In another terminal, spawn agents
+ao spawn architect claude
+ao spawn builder codex
 ```
 
-## What This Isn't
+**Dashboard keys:**
+- `r` — Refresh status
+- `:` — Command mode (type `kill architect` or `retry builder`)
+- `C` — Clear all sessions
+- `T` — Retry all failed
+- `?` — Help
+- `q` — Quit
 
-- Not an IDE. It doesn't edit code; it manages the agents that do.
-- Not a replacement for Claude Code, Codex, or Kimi. It works alongside them.
-- Not autonomous in the sci-fi sense. You decide what runs when.
+---
 
-## The Philosophy
+## What's in the Repository?
 
-AI tools are getting good. But "good" is contextual. Claude's strength is depth; Codex's is speed; Kimi's is scale. Locking yourself to one means accepting its weaknesses along with its strengths.
+```
+agent-orchestrator/
+├── cmd/ao-dashboard/        # Dashboard binary source
+├── skills/
+│   └── agent-orchestrator/
+│       └── SKILL.md         # This skill definition
+├── scripts/
+│   ├── install.sh           # Unix installer
+│   └── install.ps1          # Windows installer
+└── README.md                # Full documentation
+```
 
-Agent Orchestrator is my answer to that: a thin layer that lets each tool do what it does best, without the context-switching tax.
+**Two parts:**
+- `cmd/ao-dashboard/` — The Go binary (dashboard)
+- `skills/agent-orchestrator/` — The OpenClaw skill (`/ao` commands)
 
-If that resonates, give it a try.
+You can use either independently. Together, they give you chat-based control of your agent swarm.
+
+---
+
+## Requirements
+
+- **Dashboard**: macOS, Linux, Windows, or WSL. No Docker.
+- **Skill**: OpenClaw (Clawdbot) installed and running.
+- **Optional**: Go 1.21+ (if building from source).
+
+---
+
+## Next Steps
+
+1. **OpenClaw users**: Run `/clone https://github.com/NMC-Interactive/agent-orchestrator and link the skill for me`
+2. **Developers**: Download binary or `go install`
+3. **Read more**: [What is Agent Orchestrator?](/blog/what-is-agent-orchestrator)
 
 ---
 
 **License:** MIT  
-**Repository:** [github.com/NMC-Interactive/agent-orchestrator](https://github.com/NMC-Interactive/agent-orchestrator)
+**Repository:** [github.com/NMC-Interactive/agent-orchestrator](https://github.com/NMC-Interactive/agent-orchestrator)  
+**Questions?** Open an issue on GitHub or ask in OpenClaw chat.
