@@ -1,10 +1,11 @@
 ---
 import Base from '../layouts/Base.astro';
 import AgentCard from '../components/AgentCard';
+import SkillCard from '../components/SkillCard';
 import { getCollection } from 'astro:content';
 import { Search, TrendingUp, Clock, Star, Filter } from 'lucide-react';
 
-// Fetch all agents
+// Fetch all agents and skills
 const agents = await getCollection('agents');
 const skills = await getCollection('skills');
 
@@ -15,16 +16,23 @@ const sortedAgents = agents.sort((a, b) => {
   return b.data.votes - a.data.votes;
 });
 
-// Get featured agents
+const sortedSkills = skills.sort((a, b) => {
+  if (a.data.featured && !b.data.featured) return -1;
+  if (!a.data.featured && b.data.featured) return 1;
+  return b.data.votes - a.data.votes;
+});
+
+// Get featured
 const featuredAgents = sortedAgents.filter(a => a.data.featured);
+const featuredSkills = sortedSkills.filter(s => s.data.featured);
 
 // Get categories
-const categories = [...new Set(agents.map(a => a.data.category))];
+const categories = [...new Set([...agents.map(a => a.data.category), ...skills.map(s => s.data.category)])];
 
 // Stats
 const totalAgents = agents.length;
 const totalSkills = skills.length;
-const totalDownloads = agents.reduce((sum, a) => sum + a.data.downloads, 0);
+const totalDownloads = [...agents, ...skills].reduce((sum, item) => sum + item.data.downloads, 0);
 ---
 
 <Base title="Discover AI Agents & Skills" description="Browse and install agents and skills for OpenClaw">
@@ -163,22 +171,30 @@ const totalDownloads = agents.reduce((sum, a) => sum + a.data.downloads, 0);
 
         <!-- Skills Section -->
         <div class="mt-12 pt-12 border-t border-dark-800">
-          <h2 class="text-xl font-semibold text-white mb-4">Popular Skills</h2>
+          <div class="flex items-center justify-between mb-4">
+            <h2 class="text-xl font-semibold text-white flex items-center gap-2">
+              <span class="bg-secondary-500/10 text-secondary-400 text-sm px-2 py-1 rounded">Skill</span>
+              Popular Skills
+            </h2>
+            
+            <span class="text-dark-500 text-sm">{sortedSkills.length} results</span>
+          </div>
           
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {skills.slice(0, 4).map((skill) => (
-              <a
-                href={`/skills/${skill.slug}`}
-                class="bg-dark-900 border border-dark-800 rounded-xl p-4 hover:border-dark-700 transition"
-              >
-                <h3 class="font-semibold text-white mb-1">{skill.data.title}</h3>
-                <p class="text-dark-400 text-sm line-clamp-2">{skill.data.description}</p>
-                <div className="mt-3 flex items-center gap-3 text-xs text-dark-500">
-                  <span>{skill.data.category}</span>
-                  <span>•</span>
-                  <span>{skill.data.downloads} downloads</span>
-                </div>
-              </a>
+          <!-- Featured Skills -->
+          {featuredSkills.length > 0 && (
+            <div class="mb-6">
+              <div class="space-y-4">
+                {featuredSkills.map((skill, index) => (
+                  <SkillCard skill={skill} index={index} />
+                ))}
+              </div>
+            </div>
+          )}
+          
+          <!-- All Skills -->
+          <div class="space-y-4">
+            {sortedSkills.filter(s => !s.data.featured).slice(0, 3).map((skill, index) => (
+              <SkillCard skill={skill} index={index + featuredSkills.length} />
             ))}
           </div>
           
