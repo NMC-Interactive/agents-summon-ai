@@ -1,0 +1,188 @@
+---
+import { getCollection } from 'astro:content';
+import Base from '../../layouts/Base.astro';
+import { ArrowLeft, Download, Github, Star, Terminal, Calendar, User, Tag } from 'lucide-react';
+
+export async function getStaticPaths() {
+  const agents = await getCollection('agents');
+  return agents.map(agent => ({
+    params: { slug: agent.slug },
+    props: { agent },
+  }));
+}
+
+const { agent } = Astro.props;
+const { Content } = await agent.render();
+
+// Get related blog posts
+const blogPosts = await getCollection('blog');
+const relatedPosts = blogPosts.filter(post => 
+  post.data.related_agents?.includes(agent.slug)
+).slice(0, 3);
+---
+
+<Base title={agent.data.title} description={agent.data.description}>
+  <!-- Back Button -->
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6">
+    <a 
+      href="/" 
+      class="inline-flex items-center gap-2 text-dark-400 hover:text-white transition"
+    >
+      <ArrowLeft size={16} />
+      Back to agents
+    </a>
+  </div>
+
+  <!-- Hero Section -->
+  <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+      
+      <!-- Main Content -->
+      <div class="lg:col-span-2">
+        <!-- Header -->
+        <div class="mb-8">
+          <div class="flex items-center gap-3 mb-4">
+            <span class="bg-primary-500/10 text-primary-400 text-sm px-3 py-1 rounded-full font-medium">
+              {agent.data.category}
+            </span>
+            
+            {agent.data.featured && (
+              <span class="bg-yellow-500/10 text-yellow-400 text-sm px-3 py-1 rounded-full font-medium">
+                ⭐ Featured
+              </span>
+            )}
+          </div>
+          
+          <h1 class="text-4xl md:text-5xl font-bold text-white mb-4">{agent.data.title}</h1>
+          
+          <p class="text-xl text-dark-400">{agent.data.description}</p>
+          
+          <!-- Meta -->
+          <div class="flex flex-wrap items-center gap-6 mt-6 text-dark-400">
+            <div class="flex items-center gap-2">
+              <User size={16} />
+              <span>{agent.data.author}</span>
+            </div>
+            
+            <div class="flex items-center gap-2">
+              <Download size={16} />
+              <span>{agent.data.downloads.toLocaleString()} downloads</span>
+            </div>
+            
+            <div class="flex items-center gap-2">
+              <Star size={16} className="text-yellow-500" fill="currentColor" />
+              <span>{agent.data.rating.toFixed(1)} ({agent.data.votes} votes)</span>
+            </div>
+            
+            <div class="flex items-center gap-2">
+              <Calendar size={16} />
+              <span>Updated {agent.data.updated.toLocaleDateString()}</span>
+            </div>
+          </div>
+
+          <!-- Tags -->
+          <div class="flex flex-wrap gap-2 mt-6">
+            {agent.data.tags.map((tag) => (
+              <a
+                href={`/tags/${tag}`}
+                class="inline-flex items-center gap-1 bg-dark-800 text-dark-300 px-3 py-1 rounded-full text-sm hover:bg-dark-700 transition"
+              >
+                <Tag size={12} />
+                {tag}
+              </a>
+            ))}
+          </div>
+        </div>
+
+        <!-- Install Command Box -->
+        <div class="bg-dark-900 border border-dark-800 rounded-xl p-6 mb-8">
+          <div class="flex items-center gap-2 text-dark-400 mb-3">
+            <Terminal size={18} />
+            <span class="font-medium">Install Command</span>
+          </div>
+          
+          <div class="relative">
+            <pre class="bg-dark-950 rounded-lg p-4 overflow-x-auto"><code class="text-primary-300 font-mono text-sm">{agent.data.install_command}</code></pre>
+            
+            <button
+              onclick={`navigator.clipboard.writeText('${agent.data.install_command}')`}
+              class="absolute top-2 right-2 bg-dark-800 hover:bg-dark-700 text-dark-300 px-3 py-1 rounded text-xs transition"
+            >
+              Copy
+            </button>
+          </div>
+          
+          <p class="text-dark-500 text-sm mt-3">
+            Or install via OpenClaw: <code class="bg-dark-800 px-2 py-0.5 rounded">/ao install {agent.slug}</code>
+          </p>
+        </div>
+
+        <!-- Content -->
+        <div class="prose prose-invert prose-lg max-w-none">
+          <Content />
+        </div>
+      </div>
+
+      <!-- Sidebar -->
+      <aside class="space-y-6">
+        <!-- Actions -->
+        <div class="bg-dark-900 border border-dark-800 rounded-xl p-6">
+          <a
+            href={agent.data.repo}
+            target="_blank"
+            rel="noopener noreferrer"
+            class="flex items-center justify-center gap-2 bg-dark-800 hover:bg-dark-700 text-white w-full py-3 rounded-lg font-medium transition mb-3"
+          >
+            <Github size={18} />
+            View on GitHub
+          </a>
+          
+          <a
+            href={`https://clawhub.com/agents/${agent.slug}`}
+            class="flex items-center justify-center gap-2 bg-primary-600 hover:bg-primary-500 text-white w-full py-3 rounded-lg font-medium transition"
+          >
+            <Download size={18} />
+            Install via ClawHub
+          </a>
+        </div>
+
+        <!-- Related Posts -->
+        {relatedPosts.length > 0 && (
+          <div class="bg-dark-900 border border-dark-800 rounded-xl p-6">
+            <h3 class="text-white font-semibold mb-4">Related Articles</h3>
+            
+            <div class="space-y-4">
+              {relatedPosts.map((post) => (
+                <a
+                  href={`/blog/${post.slug}`}
+                  class="block group"
+                >
+                  <h4 class="text-dark-300 group-hover:text-white transition line-clamp-2">
+                    {post.data.title}
+                  </h4>
+                  <p class="text-dark-500 text-sm mt-1 line-clamp-2">{post.data.description}</p>
+                </a>
+              ))}
+            </div>          
+          </div>
+        )}
+
+        <!-- Topic Cluster -->
+        <div class="bg-dark-900 border border-dark-800 rounded-xl p-6">
+          <h3 class="text-white font-semibold mb-4">Topics</h3>
+          
+          <div class="flex flex-wrap gap-2">
+            {agent.data.tags.map((tag) => (
+              <a
+                href={`/tags/${tag}`}
+                class="text-sm bg-dark-800 text-dark-300 px-3 py-1.5 rounded-lg hover:bg-dark-700 transition"
+              >
+                {tag}
+              </a>
+            ))}
+          </div>
+        </div>
+      </aside>
+    </div>
+  </section>
+</Base>

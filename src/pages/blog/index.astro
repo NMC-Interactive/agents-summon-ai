@@ -1,0 +1,133 @@
+---
+import { getCollection } from 'astro:content';
+import Base from '../../layouts/Base.astro';
+import { Calendar, Clock, ArrowRight } from 'lucide-react';
+
+const posts = await getCollection('blog');
+
+// Sort by published date (newest first)
+const sortedPosts = posts.sort((a, b) => 
+  b.data.published.getTime() - a.data.published.getTime()
+);
+
+// Get categories
+const categories = [...new Set(posts.map(p => p.data.category))];
+
+// Featured posts
+const featuredPosts = sortedPosts.filter(p => p.data.featured).slice(0, 3);
+const regularPosts = sortedPosts.filter(p => !p.data.featured);
+---
+
+<Base title="Blog" description="Articles about AI agents, skills, and OpenClaw">
+  <!-- Header -->
+  <section class="bg-dark-900 border-b border-dark-800">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+      <h1 class="text-4xl md:text-5xl font-bold text-white mb-4">Blog</h1>
+      <p class="text-xl text-dark-400 max-w-2xl">
+        Tutorials, guides, and insights about building AI agents and skills for OpenClaw.
+      </p>
+
+      <!-- Categories -->
+      <div class="flex flex-wrap gap-3 mt-8">
+        <a href="/blog" class="bg-primary-500/10 text-primary-400 px-4 py-2 rounded-full text-sm font-medium">
+          All Posts
+        </a>
+        {categories.map(category => (
+          <a 
+            href={`/blog/category/${category}`}
+            class="bg-dark-800 text-dark-300 px-4 py-2 rounded-full text-sm font-medium hover:bg-dark-700 transition"
+          >
+            {category}
+          </a>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- Featured Posts -->
+  {featuredPosts.length > 0 && (
+    <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+      <h2 class="text-2xl font-bold text-white mb-6">Featured</h2>
+      
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        {featuredPosts.map((post) => (
+          <article class="bg-dark-900 border border-dark-800 rounded-xl overflow-hidden hover:border-dark-700 transition group">
+            {post.data.cover_image && (
+              <div class="h-48 bg-dark-800 overflow-hidden">
+                <img 
+                  src={post.data.cover_image} 
+                  alt={post.data.title}
+                  class="w-full h-full object-cover group-hover:scale-105 transition duration-500"
+                />
+              </div>
+            )}
+            
+            <div class="p-6">
+              <div class="flex items-center gap-3 text-sm text-dark-500 mb-3">
+                <span class="bg-primary-500/10 text-primary-400 px-2 py-1 rounded">{post.data.category}</span>
+                <span class="flex items-center gap-1">
+                  <Calendar size={14} />
+                  {post.data.published.toLocaleDateString()}
+                </span>
+              </div>
+              
+              <h3 class="text-xl font-semibold text-white mb-2 group-hover:text-primary-400 transition">
+                <a href={`/blog/${post.slug}`}>{post.data.title}</a>
+              </h3>
+              
+              <p class="text-dark-400 line-clamp-2">{post.data.description}</p>
+            </div>
+          </article>
+        ))}
+      </div>
+    </section>
+  )}
+
+  <!-- All Posts -->
+  <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+    <h2 class="text-2xl font-bold text-white mb-6">All Posts</h2>
+    
+    <div class="space-y-6">
+      {regularPosts.map((post) => (
+        <article class="bg-dark-900 border border-dark-800 rounded-xl p-6 hover:border-dark-700 transition group">
+          <div class="flex items-start justify-between gap-4">
+            <div class="flex-1">
+              <div class="flex items-center gap-3 text-sm text-dark-500 mb-2">
+                <span class="bg-dark-800 text-dark-300 px-2 py-1 rounded">{post.data.category}</span>
+                <span class="flex items-center gap-1">
+                  <Calendar size={14} />
+                  {post.data.published.toLocaleDateString()}
+                </span>
+                <span class="flex items-center gap-1">
+                  By {post.data.author}
+                </span>
+              </div>
+              
+              <h3 class="text-xl font-semibold text-white mb-2 group-hover:text-primary-400 transition">
+                <a href={`/blog/${post.slug}`}>{post.data.title}</a>
+              </h3>
+              
+              <p class="text-dark-400 mb-4">{post.data.description}</p>
+              
+              <div class="flex flex-wrap gap-2">
+                {post.data.tags.map((tag) => (
+                  <span class="text-xs bg-dark-800 text-dark-400 px-2 py-1 rounded">
+                    #{tag}
+                  </span>
+                ))}
+              </div>
+            </div>
+            
+            <a 
+              href={`/blog/${post.slug}`}
+              class="flex-shrink-0 flex items-center gap-1 text-primary-400 hover:text-primary-300 transition"
+            >
+              Read
+              <ArrowRight size={16} />
+            </a>
+          </div>
+        </article>
+      ))}
+    </div>
+  </section>
+</Base>

@@ -1,0 +1,128 @@
+---
+interface Props {
+  title: string;
+  description?: string;
+}
+
+const { title, description = "Discover and install AI agents and skills for OpenClaw" } = Astro.props;
+---
+
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width" />
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+  <meta name="generator" content={Astro.generator} />
+  <meta name="description" content={description} />
+  <title>{title} | agents.summon-ai.com</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+</head>
+<body class="bg-dark-950 text-dark-100 font-sans antialiased min-h-screen">
+  <!-- Navigation -->
+  <nav class="border-b border-dark-800 bg-dark-900/50 backdrop-blur-sm sticky top-0 z-50">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex items-center justify-between h-16">
+        <div class="flex items-center gap-2">
+          <a href="/" class="flex items-center gap-2">
+            <span class="text-2xl">🦞</span>
+            <span class="font-bold text-xl text-white">Summon</span>
+            <span class="text-primary-400">Agents</span>
+          </a>
+        </div>
+        <div class="hidden md:flex items-center gap-6">
+          <!-- <a href="/" class="text-dark-300 hover:text-white transition">Explore</a> -->
+          <!-- <a href="/agents" class="text-dark-300 hover:text-white transition">Agents</a> -->
+          <!-- <a href="/skills" class="text-dark-300 hover:text-white transition">Skills</a> -->
+          <a href="/blog" class="text-dark-300 hover:text-white transition">Blog</a>
+          <a href="https://github.com/NMC-Interactive" target="_blank" class="text-dark-300 hover:text-white transition">
+            GitHub
+          </a>
+        </div>
+        <div class="flex items-center gap-4">
+          <!-- <a href="https://clawhub.com/submit" class="bg-primary-600 hover:bg-primary-500 text-white px-4 py-2 rounded-lg text-sm font-medium transition">
+            Submit Agent
+          </a> -->
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Main Content -->
+  <main>
+    <slot />
+  </main>
+
+  <!-- Footer -->
+  <footer class="border-t border-dark-800 bg-dark-900 mt-20">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+      <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+        <div class="col-span-1 md:col-span-2">
+          <div class="flex items-center gap-2 mb-4">
+            <span class="text-2xl">🦞</span>
+            <span class="font-bold text-xl text-white">Summon Agents</span>
+          </div>
+          <p class="text-dark-400 max-w-sm">
+            Discover, install, and share AI agents and skills for OpenClaw. 
+            Build multi-agent workflows with one-line commands.
+          </p>
+        </div>
+        <div>
+          <h3 class="text-white font-semibold mb-4">Resources</h3>
+          <ul class="space-y-2">
+            <li><a href="/docs" class="text-dark-400 hover:text-white transition">Documentation</a></li>
+            <li><a href="/blog" class="text-dark-400 hover:text-white transition">Blog</a></li>
+            <li><a href="/api" class="text-dark-400 hover:text-white transition">API</a></li>
+          </ul>
+        </div>
+        <div>
+          <h3 class="text-white font-semibold mb-4">Community</h3>
+          <ul class="space-y-2">
+            <li><a href="https://discord.gg/clawd" class="text-dark-400 hover:text-white transition">Discord</a></li>
+            <li><a href="https://github.com/NMC-Interactive" class="text-dark-400 hover:text-white transition">GitHub</a></li>
+            <li><a href="https://twitter.com/summonai" class="text-dark-400 hover:text-white transition">Twitter</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="border-t border-dark-800 mt-12 pt-8 text-center text-dark-500 text-sm">
+        © 2024 Summon AI. Built with 🦞 for the OpenClaw community.
+      </div>
+    </div>
+  </footer>
+</body>
+</html>
+
+<style is:global>
+  @tailwind base;
+  @tailwind components;
+  @tailwind utilities;
+  
+  html {
+    scroll-behavior: smooth;
+  }
+  
+  code {
+    font-family: 'Fira Code', monospace;
+  }
+  
+  /* Custom scrollbar */
+  ::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+  
+  ::-webkit-scrollbar-track {
+    background: #0f172a;
+  }
+  
+  ::-webkit-scrollbar-thumb {
+    background: #334155;
+    border-radius: 4px;
+  }
+  
+  ::-webkit-scrollbar-thumb:hover {
+    background: #475569;
+  }
+</style>

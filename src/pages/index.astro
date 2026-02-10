@@ -1,0 +1,197 @@
+---
+import Base from '../layouts/Base.astro';
+import AgentCard from '../components/AgentCard';
+import { getCollection } from 'astro:content';
+import { Search, TrendingUp, Clock, Star, Filter } from 'lucide-react';
+
+// Fetch all agents
+const agents = await getCollection('agents');
+const skills = await getCollection('skills');
+
+// Sort by featured first, then by votes
+const sortedAgents = agents.sort((a, b) => {
+  if (a.data.featured && !b.data.featured) return -1;
+  if (!a.data.featured && b.data.featured) return 1;
+  return b.data.votes - a.data.votes;
+});
+
+// Get featured agents
+const featuredAgents = sortedAgents.filter(a => a.data.featured);
+
+// Get categories
+const categories = [...new Set(agents.map(a => a.data.category))];
+
+// Stats
+const totalAgents = agents.length;
+const totalSkills = skills.length;
+const totalDownloads = agents.reduce((sum, a) => sum + a.data.downloads, 0);
+---
+
+<Base title="Discover AI Agents & Skills" description="Browse and install agents and skills for OpenClaw">
+  <!-- Hero Section -->
+  <section class="relative overflow-hidden">
+    <div class="absolute inset-0 bg-gradient-to-b from-primary-900/20 to-transparent"></div>
+    
+    <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 md:py-24">
+      <div class="text-center max-w-3xl mx-auto">
+        <h1 class="text-4xl md:text-6xl font-bold text-white mb-6">
+          Discover AI Agents
+          <span class="block text-primary-400">&amp; Skills</span>
+        </h1>
+        
+        <p class="text-xl text-dark-400 mb-8">
+          Browse, vote, and install agents for OpenClaw. 
+          Build multi-agent workflows with one-line commands.
+        </p>
+
+        <!-- Search Bar -->
+        <div class="relative max-w-2xl mx-auto">
+          <div class="absolute inset-y-0 left-4 flex items-center pointer-events-none">
+            <Search className="text-dark-500" size={20} />
+          </div>
+          <input
+            type="text"
+            placeholder="Search agents, skills, tags..."
+            class="w-full bg-dark-900 border border-dark-700 rounded-xl pl-12 pr-4 py-4 text-white placeholder-dark-500 focus:outline-none focus:border-primary-500 transition"
+          />
+        </div>
+
+        <!-- Stats -->
+        <div class="flex justify-center gap-8 mt-12 text-center">
+          <div>
+            <div class="text-3xl font-bold text-white">{totalAgents}</div>
+            <div class="text-dark-500 text-sm">Agents</div>
+          </div>
+          <div>
+            <div class="text-3xl font-bold text-white">{totalSkills}</div>
+            <div class="text-dark-500 text-sm">Skills</div>
+          </div>
+          <div>
+            <div class="text-3xl font-bold text-white">{(totalDownloads / 1000).toFixed(0)}k+</div>
+            <div class="text-dark-500 text-sm">Downloads</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Main Content -->
+  <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-20">
+    <div class="grid grid-cols-1 lg:grid-cols-4 gap-8">
+      
+      <!-- Sidebar -->
+      <aside class="hidden lg:block space-y-6">
+        <!-- Sort Options -->
+        <div class="bg-dark-900 border border-dark-800 rounded-xl p-4">
+          <h3 class="text-white font-semibold mb-4 flex items-center gap-2">
+            <Filter size={16} />
+            Sort By
+          </h3>
+          
+          <div class="space-y-2">
+            <button class="w-full text-left px-3 py-2 rounded-lg bg-primary-500/10 text-primary-400 text-sm">
+              <div class="flex items-center gap-2">
+                <TrendingUp size={16} />
+                Trending
+              </div>
+            </button>
+            <button class="w-full text-left px-3 py-2 rounded-lg text-dark-400 hover:bg-dark-800 text-sm transition">
+              <div class="flex items-center gap-2">
+                <Star size={16} />
+                Top Rated
+              </div>
+            </button>
+            <button class="w-full text-left px-3 py-2 rounded-lg text-dark-400 hover:bg-dark-800 text-sm transition">
+              <div class="flex items-center gap-2">
+                <Clock size={16} />
+                Newest
+              </div>
+            </button>
+          </div>
+        </div>
+
+        <!-- Categories -->
+        <div class="bg-dark-900 border border-dark-800 rounded-xl p-4">
+          <h3 class="text-white font-semibold mb-4">Categories</h3>
+          
+          <div class="space-y-1">
+            {categories.map(category => (
+              <a
+                href={`/category/${category}`}
+                class="block px-3 py-2 rounded-lg text-dark-400 hover:bg-dark-800 hover:text-white text-sm transition"
+              >
+                {category}
+              </a>
+            ))}
+          </div>
+        </div>
+      </aside>
+
+      <!-- Agent List -->
+      <div class="lg:col-span-3">
+        
+        <!-- Featured Section (if any) -->
+        {featuredAgents.length > 0 && (
+          <div class="mb-8">
+            <h2 class="text-xl font-semibold text-white mb-4 flex items-center gap-2">
+              <Star className="text-primary-400" size={20} fill="currentColor" />
+              Featured
+            </h2>
+            
+            <div class="space-y-4">
+              {featuredAgents.map((agent, index) => (
+                <AgentCard agent={agent} index={index} />
+              ))}
+            </div>
+          </div>
+        )}
+
+        <!-- All Agents -->
+        <div>
+          <div class="flex items-center justify-between mb-4">
+            <h2 class="text-xl font-semibold text-white">All Agents</h2>
+            
+            <span class="text-dark-500 text-sm">{sortedAgents.length} results</span>
+          </div>
+          
+          <div class="space-y-4">
+            {sortedAgents.map((agent, index) => (
+              <AgentCard agent={agent} index={index} />
+            ))}
+          </div>
+        </div>
+
+        <!-- Skills Section -->
+        <div class="mt-12 pt-12 border-t border-dark-800">
+          <h2 class="text-xl font-semibold text-white mb-4">Popular Skills</h2>
+          
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {skills.slice(0, 4).map((skill) => (
+              <a
+                href={`/skills/${skill.slug}`}
+                class="bg-dark-900 border border-dark-800 rounded-xl p-4 hover:border-dark-700 transition"
+              >
+                <h3 class="font-semibold text-white mb-1">{skill.data.title}</h3>
+                <p class="text-dark-400 text-sm line-clamp-2">{skill.data.description}</p>
+                <div className="mt-3 flex items-center gap-3 text-xs text-dark-500">
+                  <span>{skill.data.category}</span>
+                  <span>•</span>
+                  <span>{skill.data.downloads} downloads</span>
+                </div>
+              </a>
+            ))}
+          </div>
+          
+          <div class="mt-6 text-center">
+            <a 
+              href="/skills" 
+              class="inline-block bg-dark-800 hover:bg-dark-700 text-white px-6 py-2 rounded-lg text-sm font-medium transition"
+            >
+              View All Skills
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+</Base>

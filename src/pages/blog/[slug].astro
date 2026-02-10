@@ -1,0 +1,98 @@
+---
+import { getCollection, getEntry } from 'astro:content';
+import Base from '../../layouts/Base.astro';
+import { Calendar, ArrowLeft, Tag } from 'lucide-react';
+
+// Generate static paths for all blog posts
+export async function getStaticPaths() {
+  const posts = await getCollection('blog');
+  return posts.map((post) => ({
+    params: { slug: post.slug },
+    props: { post },
+  }));
+}
+
+const { post } = Astro.props;
+const { Content } = await post.render();
+
+// Format date
+const publishedDate = new Date(post.data.published).toLocaleDateString('en-US', {
+  year: 'numeric',
+  month: 'long',
+  day: 'numeric'
+});
+---
+
+<Base title={post.data.title} description={post.data.description}>
+  <article class="min-h-screen bg-dark-950">
+    {/* Header */}
+    <header class="bg-dark-900 border-b border-dark-800">
+      <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        {/* Back link */}
+        <a 
+          href="/blog" 
+          class="inline-flex items-center gap-2 text-dark-400 hover:text-primary-400 transition mb-8"
+        >
+          <ArrowLeft size={16} />
+          Back to Blog
+        </a>
+
+        {/* Category */}
+        <div class="mb-4">
+          <span class="bg-primary-500/10 text-primary-400 px-3 py-1 rounded-full text-sm font-medium">
+            {post.data.category}
+          </span>
+        </div>
+
+        {/* Title */}
+        <h1 class="text-3xl md:text-4xl lg:text-5xl font-bold text-white mb-6 leading-tight">
+          {post.data.title}
+        </h1>
+
+        {/* Description */}
+        <p class="text-xl text-dark-400 mb-6">
+          {post.data.description}
+        </p>
+
+        {/* Meta */}
+        <div class="flex flex-wrap items-center gap-4 text-dark-500">
+          <span class="flex items-center gap-2">
+            <Calendar size={16} />
+            {publishedDate}
+          </span>
+          <span>by {post.data.author}</span>
+        </div>
+
+        {/* Tags */}
+        <div class="flex flex-wrap gap-2 mt-6">
+          {post.data.tags.map((tag) => (
+            <span class="inline-flex items-center gap-1 bg-dark-800 text-dark-400 px-3 py-1 rounded-full text-sm">
+              <Tag size={12} />
+              {tag}
+            </span>
+          ))}
+        </div>
+      </div>
+    </header>
+
+    {/* Content */}
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+      <div class="prose prose-invert prose-lg max-w-none">
+        <Content />
+      </div>
+    </div>
+
+    {/* Footer */}
+    <footer class="border-t border-dark-800 bg-dark-900">
+      <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <a 
+          href="/blog" 
+          class="inline-flex items-center gap-2 text-primary-400 hover:text-primary-300 transition"
+        >
+          <ArrowLeft size={16} />
+          Read more articles
+        </a>
+      </div>
+    </footer>
+  </article>
+</Base>
