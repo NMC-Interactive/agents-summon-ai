@@ -16,6 +16,29 @@ published: 2024-02-10
 updated: 2024-02-10
 ---
 
+## For OpenClaw Users (Recommended)
+
+**Let OpenClaw set this up for you.** Run this prompt in your OpenClaw chat:
+
+```
+Clone https://github.com/NMC-Interactive/agent-orchestrator and link the skill for me
+```
+
+OpenClaw will:
+1. Clone the repository to your workspace
+2. Link the skill to `~/.openclaw/skills/agent-orchestrator`
+3. Confirm the dashboard is ready to use
+
+Once linked, you can initiate the skill via /command, then control everything via chat:
+
+```
+/ao start                    # Launch dashboard
+/ao spawn builder codex      # Start implementation // truly flexible via prompt
+/ao spawn reviewer claude    # Parallel review
+/ao status                   # Check what's running
+```
+
+---
 ## Quick Start for Developers
 
 If you just want the dashboard binary:
@@ -32,29 +55,6 @@ go install github.com/NMC-Interactive/agent-orchestrator/cmd/ao-dashboard@latest
 
 ---
 
-## For OpenClaw Users (Recommended)
-
-**Let OpenClaw set this up for you.** Run this in your OpenClaw chat:
-
-```
-Clone https://github.com/NMC-Interactive/agent-orchestrator and link the skill for me
-```
-
-OpenClaw will:
-1. Clone the repository to your workspace
-2. Link the skill to `~/.openclaw/skills/agent-orchestrator`
-3. Confirm the dashboard is ready to use
-
-Once linked, you can control everything via chat:
-
-```
-/ao start                    # Launch dashboard
-/ao spawn builder codex      # Start implementation
-/ao spawn reviewer claude    # Parallel review
-/ao status                   # Check what's running
-```
-
----
 
 ## What is Agent Orchestrator?
 
@@ -144,7 +144,7 @@ Keys: (r)efresh  (:)command  (T)retry  (C)clear  (q)uit
 
 ## Installing the Dashboard (Manual)
 
-If you didn't use OpenClaw to set this up:
+Dashboard is designed to increase the process controllability.  It is yet to mature at this stage.  Use a separate terminal to start your dashboard.  If you didn't use OpenClaw to set this up:
 
 ### Option 1: Download Binary
 ```bash
@@ -183,14 +183,14 @@ Without OpenClaw, you run the dashboard directly:
 
 ```bash
 # First-time setup
-ao-dashboard --init
+ao-dashboard -init
 
 # Start daemon
-ao-dashboard --daemon
+ao-dashboard -daemon
 
-# In another terminal, spawn agents
-ao spawn architect claude
-ao spawn builder codex
+# In another terminal, use the helper script to spawn agents
+./scripts/ao-cmd.sh spawn architect claude
+./scripts/ao-cmd.sh spawn builder codex
 ```
 
 **Dashboard keys:**
