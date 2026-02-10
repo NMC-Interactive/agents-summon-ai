@@ -80,16 +80,23 @@ The dashboard doesn't judge your choices. It just makes them possible without fr
 
 ## Native OpenClaw Integration
 
-If you use OpenClaw (and if you're reading this, you probably do), the integration is seamless:
+If you use OpenClaw (and if you're reading this, you probably do), you can control the dashboard via chat:
 
-```bash
-# From any OpenClaw session
+```
 /ao start                    # Launch dashboard
 /ao spawn builder codex      # Start implementation
 /ao spawn reviewer claude    # Parallel review
 ```
 
-Agents communicate through Clawdbot. You stay in your chat interface. They work in the background. When something needs your attention, you hear about it. When everything's running smoothly, you don't.
+**To enable this:**
+```bash
+# 1. Install the dashboard (see above)
+# 2. Install the skill
+git clone https://github.com/NMC-Interactive/agent-orchestrator.git
+ln -s $(pwd)/agent-orchestrator/skills/agent-orchestrator ~/.openclaw/skills/agent-orchestrator
+```
+
+The dashboard runs in your terminal. The skill lets you control it from OpenClaw chat. Both work independently—you can use the dashboard without the skill, or the skill without other OpenClaw features.
 
 ## Installation
 
