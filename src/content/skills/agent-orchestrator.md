@@ -1,5 +1,5 @@
 ---
-title: "Agent Orchestrator"
+title: "Agent Orchestrator for 🦞OpenClaw Skill"
 description: "Mix Claude, Codex, Kimi, and more without locking to any IDE. Let Clawdbot orchestrate and work perfectly with OpenClaw ecosystem."
 author: "river"
 category: "productivity"
@@ -17,9 +17,9 @@ updated: 2024-02-10
 compatible_agents: ["claude-code", "codex-cli", "kimi-cli", "opencode"]
 ---
 
-## For OpenClaw Users (Recommended)
+## For 🦞OpenClaw Clawdbot Users (Recommended)
 
-**Let OpenClaw set this up for you.** Run this prompt in your OpenClaw chat:
+**Let 🦞OpenClaw Molty set this up for you.** Run this prompt in your OpenClaw chat:
 
 ```
 Clone https://github.com/NMC-Interactive/agent-orchestrator and link the skill for me
