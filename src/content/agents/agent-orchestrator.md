@@ -9,7 +9,7 @@ downloads: 2847
 rating: 4.8
 votes: 88
 featured: true
-install_command: "curl -fsSL https://get.ao-dashboard.dev | bash"
+install_command: "go install github.com/NMC-Interactive/agent-orchestrator/cmd/ao-dashboard@latest"
 screenshot: "/agents/ao-dashboard.png"
 logo: "/agents/ao-dashboard-logo.svg"
 published: 2024-02-10
@@ -93,18 +93,33 @@ Agents communicate through Clawdbot. You stay in your chat interface. They work 
 
 ## Installation
 
-One line:
-
+### Option 1: Go Install (Recommended)
 ```bash
-curl -fsSL https://get.ao-dashboard.dev | bash
+go install github.com/NMC-Interactive/agent-orchestrator/cmd/ao-dashboard@latest
 ```
 
-Or build from source if you prefer:
-
+### Option 2: Download Binary
 ```bash
-git clone https://github.com/NMC-Interactive/agent-orchestrator
+# macOS
+curl -L https://github.com/NMC-Interactive/agent-orchestrator/releases/latest/download/ao-dashboard-darwin-amd64 -o ao-dashboard
+chmod +x ao-dashboard
+sudo mv ao-dashboard /usr/local/bin/
+
+# Linux
+curl -L https://github.com/NMC-Interactive/agent-orchestrator/releases/latest/download/ao-dashboard-linux-amd64 -o ao-dashboard
+chmod +x ao-dashboard
+sudo mv ao-dashboard /usr/local/bin/
+
+# Windows
+# Download from: https://github.com/NMC-Interactive/agent-orchestrator/releases/latest
+```
+
+### Option 3: Build from Source
+```bash
+git clone https://github.com/NMC-Interactive/agent-orchestrator.git
 cd agent-orchestrator
 go build -o bin/ao-dashboard ./cmd/ao-dashboard
+sudo mv bin/ao-dashboard /usr/local/bin/
 ```
 
 Requirements: macOS, Linux, Windows, or WSL. No Docker. No cloud dependencies. Just a terminal.
