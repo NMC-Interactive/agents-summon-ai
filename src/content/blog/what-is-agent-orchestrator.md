@@ -6,6 +6,8 @@ author: river
 category: "tools"
 tags: ["agent-orchestrator", "multi-agent", "claude-code", "codex-cli", "kimi-cli", "tutorial"]
 featured: true
+related_skills: ["agent-orchestrator"]
+related_agents: []
 ---
 
 # What is Agent Orchestrator?
@@ -70,7 +72,7 @@ AI tools are getting good. But "good" is contextual. Claude's strength is depth;
 
 Agent Orchestrator is a thin layer that lets each tool do what it does best, without the context-switching tax.
 
-If that resonates, [try it out](/agents/agent-orchestrator).
+If that resonates, [try it out](/skills/agent-orchestrator).
 
 ---
 

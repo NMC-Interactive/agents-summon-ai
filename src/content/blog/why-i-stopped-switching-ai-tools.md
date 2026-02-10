@@ -6,6 +6,8 @@ author: river
 category: "workflow"
 tags: ["agent-orchestration", "claude-code", "codex-cli", "kimi-cli", "workflow"]
 featured: true
+related_skills: ["agent-orchestrator"]
+related_agents: []
 ---
 
 # Why I Stopped Switching Between AI Coding Tools

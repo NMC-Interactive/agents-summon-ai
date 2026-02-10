@@ -2,7 +2,7 @@
 title: "Agent Orchestrator"
 description: "Mix Claude, Codex, Kimi, and more without locking to any IDE. Let Clawdbot orchestrate and work perfectly with OpenClaw ecosystem."
 author: "river"
-category: "orchestration"
+category: "productivity"
 tags: ["dashboard", "monitoring", "multi-agent", "tui", "bubble-tea", "go", "claude-code", "codex-cli", "kimi-cli"]
 repo: "https://github.com/NMC-Interactive/agent-orchestrator"
 downloads: 2847
@@ -14,6 +14,7 @@ screenshot: "/agents/ao-dashboard.png"
 logo: "/agents/ao-dashboard-logo.svg"
 published: 2024-02-10
 updated: 2024-02-10
+compatible_agents: ["claude-code", "codex-cli", "kimi-cli", "opencode"]
 ---
 
 ## For OpenClaw Users (Recommended)
@@ -54,7 +55,6 @@ go install github.com/NMC-Interactive/agent-orchestrator/cmd/ao-dashboard@latest
 ```
 
 ---
-
 
 ## What is Agent Orchestrator?
 

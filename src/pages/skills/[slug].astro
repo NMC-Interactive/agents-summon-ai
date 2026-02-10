@@ -1,0 +1,206 @@
+---
+import { getCollection } from 'astro:content';
+import Base from '../../layouts/Base.astro';
+import { ArrowLeft, Download, Github, Star, Terminal, Calendar, User, Tag, CheckCircle } from 'lucide-react';
+
+export async function getStaticPaths() {
+  const skills = await getCollection('skills');
+  return skills.map(skill => ({
+    params: { slug: skill.slug },
+    props: { skill },
+  }));
+}
+
+const { skill } = Astro.props;
+const { Content } = await skill.render();
+
+// Get related blog posts
+const blogPosts = await getCollection('blog');
+const relatedPosts = blogPosts.filter(post => 
+  post.data.related_skills?.includes(skill.slug)
+).slice(0, 3);
+---
+
+<Base title={skill.data.title} description={skill.data.description}>
+  <!-- Back Button -->
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6">
+    <a 
+      href="/" 
+      class="inline-flex items-center gap-2 text-dark-400 hover:text-white transition"
+    >
+      <ArrowLeft size={16} />
+      Back to skills
+    </a>
+  </div>
+
+  <!-- Hero Section -->
+  <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+      
+      <!-- Main Content -->
+      <div class="lg:col-span-2">
+        <!-- Header -->
+        <div class="mb-8">
+          <div class="flex items-center gap-3 mb-4">
+            <span class="bg-secondary-500/10 text-secondary-400 text-sm px-3 py-1 rounded-full font-medium">
+              {skill.data.category}
+            </span>
+            
+            {skill.data.featured && (
+              <span class="bg-yellow-500/10 text-yellow-400 text-sm px-3 py-1 rounded-full font-medium">
+                ⭐ Featured
+              </span>
+            )}
+          </div>
+          
+          <h1 class="text-4xl md:text-5xl font-bold text-white mb-4">{skill.data.title}</h1>
+          
+          <p class="text-xl text-dark-400">{skill.data.description}</p>
+          
+          <!-- Meta -->
+          <div class="flex flex-wrap items-center gap-6 mt-6 text-dark-400">
+            <div class="flex items-center gap-2">
+              <User size={16} />
+              <span>{skill.data.author}</span>
+            </div>
+            
+            <div class="flex items-center gap-2">
+              <Download size={16} />
+              <span>{skill.data.downloads.toLocaleString()} downloads</span>
+            </div>
+            
+            <div class="flex items-center gap-2">
+              <Star size={16} className="text-yellow-500" fill="currentColor" />
+              <span>{skill.data.rating.toFixed(1)} ({skill.data.votes} votes)</span>
+            </div>
+            
+            <div class="flex items-center gap-2">
+              <Calendar size={16} />
+              <span>Updated {skill.data.updated.toLocaleDateString()}</span>
+            </div>
+          </div>
+
+          <!-- Tags -->
+          <div class="flex flex-wrap gap-2 mt-6">
+            {skill.data.tags.map((tag) => (
+              <a
+                href={`/tags/${tag}`}
+                class="inline-flex items-center gap-1 bg-dark-800 text-dark-300 px-3 py-1 rounded-full text-sm hover:bg-dark-700 transition"
+              >
+                <Tag size={12} />
+                {tag}
+              </a>
+            ))}
+          </div>
+        </div>
+
+        <!-- Install Command Box -->
+        <div class="bg-dark-900 border border-dark-800 rounded-xl p-6 mb-8">
+          <div class="flex items-center gap-2 text-dark-400 mb-3">
+            <Terminal size={18} />
+            <span class="font-medium">Skill Installation</span>
+          </div>
+          
+          <div class="relative">
+            <pre class="bg-dark-950 rounded-lg p-4 overflow-x-auto"><code class="text-secondary-300 font-mono text-sm">{skill.data.install_command}</code></pre>
+            
+            <button
+              onclick={`navigator.clipboard.writeText('${skill.data.install_command}')`}
+              class="absolute top-2 right-2 bg-dark-800 hover:bg-dark-700 text-dark-300 px-3 py-1 rounded text-xs transition"
+            >
+              Copy
+            </button>
+          </div>
+          
+          <p class="text-dark-500 text-sm mt-3">
+            Or ask OpenClaw: <code class="bg-dark-800 px-2 py-0.5 rounded">Clone {skill.data.repo} and link the skill for me</code>
+          </p>
+        </div>
+
+        <!-- Content -->
+        <div class="prose prose-invert prose-lg max-w-none">
+          <Content />
+        </div>
+      </div>
+
+      <!-- Sidebar -->
+      <aside class="space-y-6">
+        <!-- Actions -->
+        <div class="bg-dark-900 border border-dark-800 rounded-xl p-6">
+          <a
+            href={skill.data.repo}
+            target="_blank"
+            rel="noopener noreferrer"
+            class="flex items-center justify-center gap-2 bg-dark-800 hover:bg-dark-700 text-white w-full py-3 rounded-lg font-medium transition mb-3"
+          >
+            <Github size={18} />
+            View on GitHub
+          </a>
+          
+          <a
+            href={`https://clawhub.com/skills/${skill.slug}`}
+            class="flex items-center justify-center gap-2 bg-secondary-600 hover:bg-secondary-500 text-white w-full py-3 rounded-lg font-medium transition"
+          >
+            <Download size={18} />
+            Install via ClawHub
+          </a>
+        </div>
+
+        <!-- Compatible Agents -->
+        {skill.data.compatible_agents.length > 0 && (
+          <div class="bg-dark-900 border border-dark-800 rounded-xl p-6">
+            <h3 class="text-white font-semibold mb-4 flex items-center gap-2">
+              <CheckCircle size={16} className="text-green-500" />
+              Compatible Agents
+            </h3>
+            
+            <div class="flex flex-wrap gap-2">
+              {skill.data.compatible_agents.map((agent) => (
+                <span class="text-sm bg-dark-800 text-dark-300 px-3 py-1.5 rounded-lg">
+                  {agent}
+                </span>
+              ))}
+            </div>
+          </div>
+        )}
+
+        <!-- Related Posts -->
+        {relatedPosts.length > 0 && (
+          <div class="bg-dark-900 border border-dark-800 rounded-xl p-6">
+            <h3 class="text-white font-semibold mb-4">Related Articles</h3>
+            
+            <div class="space-y-4">
+              {relatedPosts.map((post) => (
+                <a
+                  href={`/blog/${post.slug}`}
+                  class="block group"
+                >
+                  <h4 class="text-dark-300 group-hover:text-white transition line-clamp-2">
+                    {post.data.title}
+                  </h4>
+                  <p class="text-dark-500 text-sm mt-1 line-clamp-2">{post.data.description}</p>
+                </a>
+              ))}
+            </div>          
+          </div>
+        )}
+
+        <!-- Topic Cluster -->
+        <div class="bg-dark-900 border border-dark-800 rounded-xl p-6">
+          <h3 class="text-white font-semibold mb-4">Topics</h3>
+          
+          <div class="flex flex-wrap gap-2">
+            {skill.data.tags.map((tag) => (
+              <a
+                href={`/tags/${tag}`}
+                class="text-sm bg-dark-800 text-dark-300 px-3 py-1.5 rounded-lg hover:bg-dark-700 transition"
+              >
+                {tag}
+              </a>
+            ))}
+          </div>
+        </div>
+      </aside>
+    </div>
+  </section>
+</Base>
